@@ -1,10 +1,61 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_second_brain/models/fcm_notification.model.dart';
 
-Future<void> handleBackgroundNotification(Map<String, dynamic> message) {
-  print("FCM background message => $message");
+int _notificationId = 1000;
+
+int getForegroundNotificationId() {
+  return _notificationId++;
+}
+
+int getBackgroundNotificationId() {
+  return _notificationId++;
+}
+
+Future<dynamic> handleBackgroundNotification(Map<String, dynamic> message) {
+  final localNotifications = FlutterLocalNotificationsPlugin();
+  final androidInitializationSettings =
+      AndroidInitializationSettings('@drawable/notification_icon');
+  final iosInitializationSettings = IOSInitializationSettings(
+    requestSoundPermission: false,
+    requestBadgePermission: false,
+    requestAlertPermission: false,
+    onDidReceiveLocalNotification: null,
+  );
+  final initializationSettings = InitializationSettings(
+    android: androidInitializationSettings,
+    iOS: iosInitializationSettings,
+  );
+
+  localNotifications.initialize(initializationSettings);
+
+  final _notificationDetails = NotificationDetails(
+    android: AndroidNotificationDetails("", "", ""),
+    iOS: IOSNotificationDetails(),
+  );
+
+  if (message.containsKey('aps')) {
+    final p = json.decode(json.encode(message));
+    localNotifications.show(
+      getBackgroundNotificationId(),
+      p.aps.alert.title,
+      p.aps.alert.body,
+      _notificationDetails,
+    );
+  } else if (message.containsKey("notification")) {
+    final p = json.decode(json.encode(message));
+    localNotifications.show(
+      getBackgroundNotificationId(),
+      p.notification.title,
+      p.notification.body,
+      _notificationDetails,
+    );
+  }
+  return null;
 }
 
 void main() {
@@ -36,10 +87,35 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   FirebaseMessaging _firebaseMessaging;
+  FlutterLocalNotificationsPlugin _localNotifications;
+  AndroidInitializationSettings _androidInitializationSettings;
+  IOSInitializationSettings _iosInitializationSettings;
+  InitializationSettings _initializationSettings;
+  NotificationDetails _notificationDetails;
+  int _notificationId;
 
   @override
   void initState() {
+    _notificationId = 0;
     _firebaseMessaging = FirebaseMessaging();
+    _localNotifications = FlutterLocalNotificationsPlugin();
+    _androidInitializationSettings =
+        AndroidInitializationSettings('@drawable/notification_icon');
+    _iosInitializationSettings = IOSInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+      onDidReceiveLocalNotification: null,
+    );
+    _initializationSettings = InitializationSettings(
+      android: _androidInitializationSettings,
+      iOS: _iosInitializationSettings,
+    );
+    _localNotifications.initialize(_initializationSettings);
+    _notificationDetails = NotificationDetails(
+      android: AndroidNotificationDetails("", "", ""),
+      iOS: IOSNotificationDetails(),
+    );
 
     if (Platform.isIOS) {
       _firebaseMessaging.requestNotificationPermissions(
@@ -60,12 +136,15 @@ class _MyHomePageState extends State<MyHomePage> {
     _firebaseMessaging.configure(
       onMessage: (message) async {
         print("FCM message => $message");
+        _showNotifications(message);
       },
       onLaunch: (message) async {
         print("FCM message => $message");
+        _showNotifications(message);
       },
       onResume: (message) async {
         print("FCM message => $message");
+        _showNotifications(message);
       },
       onBackgroundMessage: handleBackgroundNotification,
     );
@@ -77,6 +156,32 @@ class _MyHomePageState extends State<MyHomePage> {
         );
 
     super.initState();
+  }
+
+  _showNotifications(message) {
+    if (message.containsKey('aps')) {
+      final p = FCMNotification.fromJson(json.decode(json.encode(message)));
+      _localNotifications.show(
+        _getNotificationId(),
+        p.aps.alert.title,
+        p.aps.alert.body,
+        _notificationDetails,
+      );
+    }
+    // TODO: Migrate to model
+    else if (message.containsKey("notification")) {
+      final p = json.decode(json.encode(message));
+      _localNotifications.show(
+        _getNotificationId(),
+        p.notification.title,
+        p.notification.body,
+        _notificationDetails,
+      );
+    }
+  }
+
+  int _getNotificationId() {
+    return _notificationId++;
   }
 
   @override
