@@ -3,16 +3,17 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_second_brain/models/fcm_notification.model.dart';
 
 int _notificationId = 1000;
 
-int getForegroundNotificationId() {
-  return _notificationId++;
-}
+int _notificationCount = 0;
 
 int getBackgroundNotificationId() {
+  _notificationCount += 1;
+  FlutterAppBadger.updateBadgeCount(_notificationCount);
   return _notificationId++;
 }
 
@@ -92,19 +93,21 @@ class _MyHomePageState extends State<MyHomePage> {
   IOSInitializationSettings _iosInitializationSettings;
   InitializationSettings _initializationSettings;
   NotificationDetails _notificationDetails;
-  int _notificationId;
+  int _foregroundNotificationCount;
+  int _foregroundNotificationId;
 
   @override
   void initState() {
-    _notificationId = 0;
+    _foregroundNotificationCount = 0;
+    _foregroundNotificationId = 0;
     _firebaseMessaging = FirebaseMessaging();
     _localNotifications = FlutterLocalNotificationsPlugin();
     _androidInitializationSettings =
         AndroidInitializationSettings('@drawable/notification_icon');
     _iosInitializationSettings = IOSInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
       onDidReceiveLocalNotification: null,
     );
     _initializationSettings = InitializationSettings(
@@ -160,6 +163,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _showNotifications(message) {
     if (message.containsKey('aps')) {
+      FlutterAppBadger.updateBadgeCount(_foregroundNotificationCount++);
+
       final p = FCMNotification.fromJson(json.decode(json.encode(message)));
       _localNotifications.show(
         _getNotificationId(),
@@ -181,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   int _getNotificationId() {
-    return _notificationId++;
+    return _foregroundNotificationId++;
   }
 
   @override
