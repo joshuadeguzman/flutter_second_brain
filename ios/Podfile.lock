@@ -72,6 +72,10 @@ PODS:
     - nanopb/encode (= 1.30906.0)
   - nanopb/decode (1.30906.0)
   - nanopb/encode (1.30906.0)
+  - Plaid (1.1.36)
+  - plaid_flutter (0.0.1):
+    - Flutter
+    - Plaid (= 1.1.36)
   - PromisesObjC (1.2.10)
   - Protobuf (3.13.0)
 
@@ -81,6 +85,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_app_badger (from `.symlinks/plugins/flutter_app_badger/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - plaid_flutter (from `.symlinks/plugins/plaid_flutter/ios`)
 
 SPEC REPOS:
   trunk:
@@ -95,6 +100,7 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleUtilities
     - nanopb
+    - Plaid
     - PromisesObjC
     - Protobuf
 
@@ -109,6 +115,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_app_badger/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  plaid_flutter:
+    :path: ".symlinks/plugins/plaid_flutter/ios"
 
 SPEC CHECKSUMS:
   Firebase: 7cf5f9c67f03cb3b606d1d6535286e1080e57eb6
@@ -127,6 +135,8 @@ SPEC CHECKSUMS:
   GoogleDataTransport: b7f406340a291370045a270c599e53c6fa6ec20f
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
+  Plaid: 7944259887082f82be5df36ef211bf306146f557
+  plaid_flutter: 62b9bbf28feafd95c2d8e44d770ac5867669efbc
   PromisesObjC: b14b1c6b68e306650688599de8a45e49fae81151
   Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
 

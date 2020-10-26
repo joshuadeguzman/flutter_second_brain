@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_second_brain/models/fcm_notification.model.dart';
+import 'package:flutter_second_brain/screens/plain_account_linking.screen.dart';
 
 int _notificationId = 1000;
 
@@ -59,7 +61,8 @@ Future<dynamic> handleBackgroundNotification(Map<String, dynamic> message) {
   return null;
 }
 
-void main() {
+Future main() async {
+  await DotEnv().load('.env');
   runApp(MyApp());
 }
 
@@ -72,11 +75,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: PlaidAccountLinkingScreen(),
     );
   }
 }
 
+// TODO: Clean up directory
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
